@@ -1,0 +1,41 @@
+{
+  "repo_name": "podwatcher",
+  "date": "2026-11-06",
+  "category": "kubernetes-security",
+  "one_line_summary": "A small auditor that reports when running pods are using images that no longer match what the registry says, so drift between deployed images and the registry does not stay hidden.",
+  "problem": "A cluster can keep running an image long after the registry has a newer or different image, and most drift checks focus on policy or admission rather than the live gap between running images and registry state.",
+  "audience": "Strong engineering depth / platform-and-security teams: people who operate or audit Kubernetes and want a concrete view of image drift between pods and a registry.",
+  "solution": "A tool that lists running pods, extracts the image references, queries the registry for the matching manifest or digest, and reports pods whose running image differs from the registry answer. It focuses on the comparison and the report, with clear skip/mismatch reasons.",
+  "key_features": [
+    "List running pods and extract image references from a kubeconfig or in-cluster config",
+    "Query a registry for the image reference the pod is using",
+    "Compare running image against registry answer and classify match, mismatch, and skip reasons",
+    "Produce a report of drift with pod, namespace, image, and reason",
+    "Pluggable registry access so different registries can be handled by the same comparison logic"
+  ],
+  "tech_stack": ["python"],
+  "mvp_scope": "A pod-image enumerator, a registry image resolver interface with one concrete implementation, a comparator that classifies match/mismatch/skip, and a report printer. The MVP is the comparison path and the report; it does not try to be a full registry client.",
+  "non_dev_usable": false,
+  "tests_plan": [
+    "Unit tests for image-reference parsing and comparison classification",
+    "Unit tests for the comparator's match/mismatch/skip decision logic",
+    "Unit tests for the report formatter",
+    "A recorded or mocked registry interaction test so the resolver path is covered without needing a live registry"
+  ],
+  "files": {
+    "enumerate.py": "Pod/image enumeration from kubeconfig or in-cluster config",
+    "registry.py": "Registry resolver interface and a basic implementation",
+    "compare.py": "Comparator and classification logic",
+    "report.py": "Report formatting",
+    "main.py": "CLI entry point",
+    "tests/test_compare.py": "Comparison classification tests",
+    "tests/test_report.py": "Report formatting tests",
+    "tests/test_parse.py": "Image reference parsing tests",
+    "tests/run_tests.sh": "Run pytest",
+    "README.md": "What it audits, how to run it, what it does and does not cover",
+    "RESULTS.md": "Actual observed results and test output",
+    "SECURITY.md": "Security-relevant notes for a tool that touches cluster access and registry queries",
+    ".gitignore": "__pycache__, .pytest_cache",
+    "LICENSE": "MIT"
+  }
+}
